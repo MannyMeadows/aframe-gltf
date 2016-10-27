@@ -1,59 +1,59 @@
 module AFRAMEGLTF {
   'use strict';
 
-  function init() {
-    this.model = null;
-  }
+  export function Component() {
+    function init() {
+      this.model = null;
+			this.loader = new THREE.GLTFLoader();
+    }
 
-  function update() {
-    let self = this,
-        el = this.el,
-        src = this.data.src,
-        loop = this.data.loop,
-        auto = this.data.auto;
+    function update() {
+      let self = this,
+          el = this.el,
+          asset = this.data.asset,
+          loop = this.data.loop,
+          auto = this.data.auto;
 
-    if (!src) { return; }
+      if (!asset) { return; }
 
-    this.remove();
+      this.remove();
 
-    loader.load(src, function (_gltf) {
-      gltf = _gltf;
+      this.loader.load(asset, function (gltf) {
+        self.model = gltf.scene;
+        self.animations = gltf.animations || {};
+				self.cameras = gltf.cameras || {};
 
-      self.model = gltf.scene;
-      self.animations = gltf.animations || {};
+        el.setObject3D('mesh', self.model);
+        el.emit('model-loaded', {
+          format: 'gltf',
+          model: self.model,
+          animations: self.animations,
+					cameras: self.cameras
+        });
 
-      el.setObject3D('mesh', self.model);
-      el.emit('model-loaded', {
-        format: 'gltf',
-        model: self.model,
-        animations: self.animations
-      });
-
-      if (gltf.animations && gltf.animations.length) {
-        let len = (gltf.animations) ? gltf.animations.length : 0;
-        while (len--) {
-          let animation = gltf.animations[len];
-          animation.loop = loop;
-          if (auto) {
-            animation.play();
+        if (gltf.animations && gltf.animations.length) {
+          let len = (gltf.animations) ? gltf.animations.length : 0;
+          while (len--) {
+            let animation = gltf.animations[len];
+            animation.loop = loop;
+            if (auto) {
+              animation.play();
+            }
           }
         }
-      }
-    });
-  }
+      });
+    }
 
-  function remove() {
-    if (!this.model) { return; }
-    this.el.removeObject3D('mesh');
-  }
+    function remove() {
+      if (!this.model) { return; }
+      this.el.removeObject3D('mesh');
+    }
 
-  let loader = new THREE.glTFLoader(),
-      gltf = null;
+    let loader = null;
 
-  export function Component() {
     return {
       schema: {
-        src: {type: 'src'},
+        asset: {type: 'asset'},
         loop: {default: true},
         auto: {default: true}
       },

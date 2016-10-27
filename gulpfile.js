@@ -9,17 +9,9 @@
       uglify = require('gulp-uglify'),
       connect = require('gulp-connect'),
       scripts = [
-        './bower_components/three.js/examples/js/loaders/gltf/glTF-parser.js',
-        './bower_components/three.js/examples/js/loaders/gltf/glTFLoaderUtils.js',
-        './bower_components/three.js/examples/js/loaders/gltf/glTFLoader.js',
-        './bower_components/three.js/examples/js/loaders/gltf/glTFAnimation.js',
-        './bower_components/three.js/examples/js/loaders/gltf/glTFShaders.js',
+        './bower_components/three.js/examples/js/loaders/GLTFLoader.js',
         './build/src.js'
       ];
-
-  function clean() {
-    return del.sync(['build', 'dist']); 
-  }
 
   function src() {
     return gulp.src('src/main.ts')
@@ -30,6 +22,10 @@
       .pipe(jshint())
       .pipe(jshint.reporter('jshint-stylish'))
       .pipe(gulp.dest('build'))
+  }
+
+  function clean() {
+    return del.sync(['build', 'dist']); 
   }
 
   function main() {
